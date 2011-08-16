@@ -13,7 +13,7 @@ using namespace std;
 
 int _tmain(int argc, _TCHAR* argv[])
 {
-	char* filePath = "D:\\My Documents\\vs 2010 project\\火灾.avi";
+	char* filePath = "G:\\2000 2004年全国特大火灾案例选编05.AVI";
 	CvCapture* capture = cvCaptureFromAVI(filePath);
 	if(!capture)
 		return 0;
@@ -93,6 +93,7 @@ int _tmain(int argc, _TCHAR* argv[])
 				double r2 = sj/(r+1);
 				double j2 = b/(sj+1);
 				double b2 = b/(r+1);
+				//烟雾像素识别
 				if((0.3043<r1&&r1<0.3353)&&(0.3187<j1&&j1<0.3373)&&(r1<j1))
 				{
 					snum1++;
@@ -101,6 +102,8 @@ int _tmain(int argc, _TCHAR* argv[])
 					((uchar*)(colorlaplace->imageData+i*colorlaplace->widthStep))[j*colorlaplace->nChannels+1] = 255;
 					((uchar*)(colorlaplace->imageData+i*colorlaplace->widthStep))[j*colorlaplace->nChannels+2] = 255;
 				}
+				//火焰像素识别
+				/*
 				if((0.25<r2&&r2<0.65)&&(0.2<j2&&j2<0.6)&&(0.05<b2&&b2<0.45)&&(r>200)&&(b<100)&&(sj<200))
 				{
 					snum2++;
@@ -109,6 +112,8 @@ int _tmain(int argc, _TCHAR* argv[])
 					((uchar*)(colorlaplace->imageData+i*colorlaplace->widthStep))[j*colorlaplace->nChannels+1] = 0;
 					((uchar*)(colorlaplace->imageData+i*colorlaplace->widthStep))[j*colorlaplace->nChannels+2] = 255;
 				}
+				*/
+
 			}
 		}
 		num1 = cvCountNonZero(pframemat6);
