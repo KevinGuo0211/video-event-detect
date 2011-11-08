@@ -5,11 +5,29 @@
 #include "cv.h"
 #include "highgui.h"
 #include<fstream>
+#include<string>
+using namespace std;
+
+double max(double a, double b)
+{
+	if(a > b)
+		return a;
+	else
+		return b;
+}
 
 double max(double a,double b,double c)
 {
 	double temp=max(a,b);
 	return max(temp,c);
+}
+
+double min(double a, double b)
+{
+	if(a < b)
+		return a;
+	else
+		return b;
 }
 
 double min(double a,double b,double c)
@@ -44,13 +62,28 @@ void insert(int &max, int &mid, int &mix, int a)
 
  extern "C" __declspec(dllexport) int fireDetect(char* filePath)
  {  
-	 CvCapture* capture = cvCaptureFromAVI(filePath);
+	 ofstream ofs;
+	 ifstream ifs;
+	 CvCapture* capture;
+	 if(strcmp(filePath,"-1")==0){
+		 capture = cvCaptureFromCAM(-1);
+	 }else{
+		 capture = cvCaptureFromAVI(filePath);
+	 }
 	
-	 if(!capture)
+	 if(!capture){
+		ofs.open("error.txt", ostream::trunc);
+		ofs.close();
+		ofs.clear();
 		return 0;
+	 }
 	 int height = (int)cvGetCaptureProperty(capture, CV_CAP_PROP_FRAME_HEIGHT);
 	 int width = (int)cvGetCaptureProperty(capture, CV_CAP_PROP_FRAME_WIDTH);
 	 int fps = (int)cvGetCaptureProperty(capture, CV_CAP_PROP_FPS);
+	 if(fps==0)
+	 {
+		 fps = 25;
+	 }
 	 IplImage *frame=0;
 	 IplImage *pf1=0 , *pf2=0 , *pf3=0, *pFrImg=0 ;
 	 pf1 = cvCreateImage(cvSize(width, height),8,1);
@@ -72,7 +105,7 @@ void insert(int &max, int &mid, int &mix, int a)
 	 //double r1,j1,r2,j2,b2;
 	 bool isShowFire = false;
 
-	 ofstream ofs;
+	 
 	 ofs.open("Area.txt", ostream::trunc);
 	 ofs.close();
 	 ofs.clear();
@@ -87,7 +120,8 @@ void insert(int &max, int &mid, int &mix, int a)
 	 ofs.clear();
 
 	 int num = 1;
-	 while(true)
+	 bool run = true;
+	 while(run)
 	 {
 		 //运动物体检测部分
 		 frame = cvQueryFrame(capture);
@@ -191,7 +225,7 @@ void insert(int &max, int &mid, int &mix, int a)
 							 isFirePix = true;
 					    }
 				    }
-
+					/*
 					if(!isFirePix)
 					{
 						//烟雾检测
@@ -215,6 +249,7 @@ void insert(int &max, int &mid, int &mix, int a)
 							((uchar*)(pFrImg->imageData + y*pFrImg->widthStep))[x*pFrImg->nChannels+2] = 0;  //R	
 						}
 					}
+					*/
 			    }else
 			    {
 				     ((uchar*)(pFrImg->imageData + y*pFrImg->widthStep))[x*pFrImg->nChannels] = 0;  //B
@@ -253,10 +288,21 @@ void insert(int &max, int &mid, int &mix, int a)
 			 }
 			 cvReleaseMemStorage(&stor);
 
+			 //读文件
+			 ifs.open("state.txt", istream::in);
+			 string str;
+			 ifs>>str;
+			 if(str.at(0)=='0'){
+				 run = false;
+			 }
+			 ifs.close();
+			 ifs.clear();
+
 			 //写入文件
 			
 			 int areaInt = (int)(10000.0*totalArea/(width*height));
 		     float areaFloat = (float)areaInt / 100;
+
 
 			 ofs.open("Area.txt", ostream::app);
 			 ofs<<areaFloat<<",";
@@ -312,6 +358,8 @@ void insert(int &max, int &mid, int &mix, int a)
 	 cvReleaseImage(&pf3);
 	 cvReleaseImage(&pFrImg);
 	 cvReleaseImage(&frame);
+
+	 cvReleaseCapture(&capture);
 
 	 cvDestroyWindow("烟火二值图");
 	 cvDestroyWindow("原视频");
