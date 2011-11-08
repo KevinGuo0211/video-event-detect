@@ -42,6 +42,7 @@
             this.label5 = new System.Windows.Forms.Label();
             this.timeLabel = new System.Windows.Forms.Label();
             this.showButton = new System.Windows.Forms.Button();
+            this.cameraButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -50,7 +51,7 @@
             this.readButton.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.readButton.Image = global::烟火检测CSHARP.Properties.Resources.openFileButton;
             this.readButton.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.readButton.Location = new System.Drawing.Point(91, 12);
+            this.readButton.Location = new System.Drawing.Point(39, 12);
             this.readButton.Name = "readButton";
             this.readButton.Size = new System.Drawing.Size(136, 78);
             this.readButton.TabIndex = 0;
@@ -192,11 +193,23 @@
             this.showButton.UseVisualStyleBackColor = true;
             this.showButton.Click += new System.EventHandler(this.showButton_Click);
             // 
+            // cameraButton
+            // 
+            this.cameraButton.Font = new System.Drawing.Font("宋体", 10.5F);
+            this.cameraButton.Location = new System.Drawing.Point(204, 12);
+            this.cameraButton.Name = "cameraButton";
+            this.cameraButton.Size = new System.Drawing.Size(134, 78);
+            this.cameraButton.TabIndex = 15;
+            this.cameraButton.Text = "实时监控";
+            this.cameraButton.UseVisualStyleBackColor = true;
+            this.cameraButton.Click += new System.EventHandler(this.cameraButton_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(770, 412);
+            this.Controls.Add(this.cameraButton);
             this.Controls.Add(this.showButton);
             this.Controls.Add(this.timeLabel);
             this.Controls.Add(this.label5);
@@ -235,6 +248,7 @@
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label timeLabel;
         private System.Windows.Forms.Button showButton;
+        private System.Windows.Forms.Button cameraButton;
     }
 }
 

@@ -15,10 +15,10 @@ namespace 烟火检测CSHARP
     {
         delegate void SetTextCallback(string text);
         private string filePath;
-        bool isDetecting = true;
+        bool isDetecting = false;
         bool isDrawing = true;
         bool isShow = false;
-        bool isShowFire = false;
+        bool isRunningDetect = false;
         bool isFire = false;
         int index = 0;
         //private Thread fireDetectThread = new Thread(new ThreadStart(fireDetect));
@@ -38,26 +38,38 @@ namespace 烟火检测CSHARP
 
         private void readButton_Click(object sender, EventArgs e)
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Filter = "avi文件|*.avi";
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            isDetecting = !isDetecting;
+            isRunningDetect = !isRunningDetect;
+            fileWrite();
+            if (isRunningDetect)
             {
-                filePath = openFileDialog.FileName;
-                Thread fireDetectThread = new Thread(new ThreadStart(fireDetect));
-                fireDetectThread.Start();
-                isDetecting = true;
-                Thread.Sleep(1000);
-                Thread drawLineThread = new Thread(new ThreadStart(drawLine));
-                drawLineThread.Start();
-                isDrawing = true;
+                OpenFileDialog openFileDialog = new OpenFileDialog();
+                openFileDialog.Filter = "avi文件|*.avi";
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    filePath = openFileDialog.FileName;
+                    Thread fireDetectThread = new Thread(new ThreadStart(fireDetect));
+                    fireDetectThread.Start();
+
+                    Thread.Sleep(1000);
+                    Thread drawLineThread = new Thread(new ThreadStart(drawLine));
+                    drawLineThread.Start();
+                    isDrawing = true;
+                }
             }
         }
         //烟火检测线程
         private void fireDetect()
         {
             CPPDLL.fireDetect(filePath.ToCharArray());
-            isDetecting = false;
         }
+
+        //实时烟火检测线程
+        private void cameraFireDetect()
+        {
+            CPPDLL.fireDetect("-1".ToCharArray());
+        }
+
         //画曲线图线程
         private void drawLine()
         {
@@ -358,6 +370,41 @@ namespace 烟火检测CSHARP
                 this.timeLabel.Text = value;
                 //this.scaleLabel.PerformStep();
             }
+        }
+
+        Thread fireDetectThread;
+        private void cameraButton_Click(object sender, EventArgs e)
+        {
+            isDetecting = !isDetecting;
+            isRunningDetect = !isRunningDetect;
+            fileWrite();
+            if (isRunningDetect)
+            {
+                fireDetectThread = new Thread(new ThreadStart(cameraFireDetect));
+                fireDetectThread.Start();
+                
+                Thread.Sleep(1000);
+                Thread drawLineThread = new Thread(new ThreadStart(drawLine));
+                drawLineThread.Start();
+                isDrawing = true;
+            }
+            
+        }
+
+        //写文件函数
+        private void fileWrite()
+        {
+            //写文件
+            FileStream fs = new FileStream("state.txt", FileMode.Create);
+            string str = "0";
+            if (isRunningDetect)
+            {
+                str = "1";
+            }
+            byte[] data = new UTF8Encoding().GetBytes(str);
+            fs.Write(data, 0, data.Length);
+            fs.Flush();
+            fs.Close();
         }
     }
 }
